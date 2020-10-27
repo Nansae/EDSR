@@ -15,7 +15,7 @@ EDSR is one way to solve the super resolution problem of a single image. This re
 ## Files and Directories
 * data.py : This file loads the 50x50 images and 100x100 images
 * model.py : This file has implemented EDSR network by pytorch
-* test.py : This file inputs 50x50 images in the test folder into the model and compares it with the 100x100x label image.
+* test.py : This file inputs 50x50 images in the test folder into the model and compares it with the 100x100 label image.
 * train.py : This file training the 50x50 images  as a 100x100 label image in the data/train folder.
 
 ```
