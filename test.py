@@ -31,34 +31,43 @@ def test(args):
         data50, data100 = data
         data50 = data50.to(device)
 
-        _, out_img = model(data50)
+        _, out_imgs = model(data50)
 
-        images = []
+        res = []
+        for idx in range(len(out_imgs)):
+            images = []
+            ## input
+            data50_cpu = torch.squeeze(data50[idx]).cpu()
+            images.append(transforms.ToPILImage()(data50_cpu).convert("RGB"))
+            ## output
+            output = torch.squeeze(out_imgs[idx]).cpu()
+            images.append(transforms.ToPILImage()(output).convert("RGB"))
+            # origin
+            data100_cpu = torch.squeeze(data100[idx])
+            images.append(transforms.ToPILImage()(data100_cpu).convert("RGB"))
+            print(idx, len(images))
+            res.append(images)
 
-        ## input
-        data50 = torch.squeeze(data50).cpu()
-        images.append(transforms.ToPILImage()(data50).convert("RGB"))
-
-        ## output
-        output = torch.squeeze(out_img).cpu()
-        images.append(transforms.ToPILImage()(output).convert("RGB"))
-
-        # origin
-        data100 = torch.squeeze(data100)
-        images.append(transforms.ToPILImage()(data100).convert("RGB"))
-
-        fig = plt.figure()
-        rows = 1
+        fig = plt.figure(figsize=(7, 8))
+        rows = args.batchsize
         cols = 3
 
         titles = ['input', 'output', 'origin']
         axes = []
-        for i in range(cols*rows):
-            axes.append(fig.add_subplot(rows, cols, i+1))
-            subplot_title = titles[i]
-            axes[-1].set_title(subplot_title)
-            plt.imshow(images[i])
-            plt.savefig('res.png', dpi=300)
+        for r in range(rows):
+            for c in range(cols):
+                axes.append(fig.add_subplot(rows, cols, (r*cols+c) + 1))
+                subplot_title = titles[c]
+                axes[-1].set_title(subplot_title)
+                plt.imshow(res[r][c])
+                plt.savefig('res.png', dpi=300)
+
+        # for i in range(cols*rows):
+        #     axes.append(fig.add_subplot(rows, cols, i+1))
+        #     subplot_title = titles[i]
+        #     axes[-1].set_title(subplot_title)
+        #     plt.imshow(images[i])
+        #     plt.savefig('res.png', dpi=300)
 
         plt.show()
 
@@ -67,7 +76,7 @@ if __name__ == "__main__":
     parser.add_argument("--path", default='data/test')
     parser.add_argument("--layers", default=32, type=int)
     parser.add_argument("--featuresize", default=256, type=int)
-    parser.add_argument("--batchsize", default=1, type=int)
+    parser.add_argument("--batchsize", default=3, type=int)
     parser.add_argument("--savedir", default='saved_models/edsr_step_50.pth')
     args = parser.parse_args()
 
